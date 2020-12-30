@@ -1,6 +1,10 @@
 {
   "name": "dive-front",
   "version": "1.0.0",
+  "author": {
+    "name": "Rémi Beaufils",
+    "email": "remi.beaufils@gmail.com"
+  },
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -13,14 +17,12 @@
     "@ant-design/icons": "latest",
     "antd": "latest",
     "next": "latest",
-    "node-fetch": "^2.6.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "swr": "^0.3.11"
   },
   "devDependencies": {
     "@types/node": "^14.14.13",
-    "@types/node-fetch": "^2.5.7",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@zeit/next-less": "^1.0.1",

@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { Area } from '@ant-design/charts';
 import { Typography } from 'antd';
 import { AreaConfig } from '@ant-design/charts/es/area';
+import moment from 'moment';
 import "./Chart.less";
 
 const { Title } = Typography;
@@ -13,18 +14,6 @@ type Props = {
 }
 
 const ChartArea: React.FC<Props> = ({ data, height, title }: Props) => {
-  const ref = useRef();
-
-  const downloadImage = () => {
-    ref?.current?.downloadImage();
-    // @ts-ignore: Object is possibly 'null'.
-    // https://stackoverflow.com/questions/40349987/how-to-suppress-error-ts2533-object-is-possibly-null-or-undefined
-  };
-
-  const toDataURL = () => {
-    console.log(ref?.current?.toDataURL());
-  };
-
   const config: AreaConfig = {
     data,
     height: height || 131,
@@ -36,7 +25,11 @@ const ChartArea: React.FC<Props> = ({ data, height, title }: Props) => {
     //   y: { alias: 'yLabel' }
     // },
     xAxis: {
-      line: null
+      line: null,
+      label: {
+        // autoHide: false,
+        formatter: (x: string) => moment(x).format('MMM')
+      },
     },
     yAxis: {
       grid: null,
@@ -51,13 +44,7 @@ const ChartArea: React.FC<Props> = ({ data, height, title }: Props) => {
     <>
       {/* <Title level={5} className="title">{title}</Title> */}
       <p className="title">{title}</p>
-      {/* <button type="button" onClick={downloadImage} style={{ marginRight: 24 }}>
-        downloadImage
-      </button>
-      <button type="button" onClick={toDataURL}>
-        toDataURL
-      </button> */}
-      <Area {...config} chartRef={ref} />
+      <Area {...config}/>
     </>
   )
 };

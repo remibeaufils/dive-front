@@ -5,6 +5,11 @@ import moment from 'moment';
 import ChartArea from '../../components/dashboard/ChartArea';
 import ChartColumn from '../../components/dashboard/ChartColumn';
 import "./dashboard.less";
+import { GetServerSidePropsContext, NextPage } from 'next';
+import fetch from '../../lib/fetch';
+import { withAuth } from '../../lib/withAuth';
+import { buildQueryString } from '../../lib/buildQueryString';
+import useSWR from '../../lib/useSWR';
 
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
@@ -27,36 +32,42 @@ type DataRow = {
   profitPerUnit: number,
 };
 
-const fetcher = async (url: string, params: Object) => {
-  const queryString = Object.keys(params).reduce((acc, key) => [
-    ...acc,
-    `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
-  ], []);
-  // return fetch(`${url}?${queryString.join('&')}`).then(res => res.json());
-  const res = await fetch(`${url}?${queryString.join('&')}`);
-  return res.json();
+type Props = {
+  initialData: any[],
+  initialFrom: string,
+  initialTo: string
 };
 
-const DashboardPage: React.FC = ({ initialData, initialFrom, initialTo }: any) => {
-  const [data, setData] = useState(initialData);
+const DashboardPage: NextPage<Props> = ({
+  initialData,
+  initialFrom,
+  initialTo
+}) => {
+  const [queryParams, setQueryParams] = useState({ from: initialFrom, to: initialTo });
 
-  const { data1, data2, data3, data4, data5, data6, data7, data8 } = data.reduce((
-    { data1, data2, data3, data4, data5, data6, data7, data8 }: Series,
-    dataRow: DataRow,
-    index: number
+  const { data } = useSWR(
+    `/context/dashboard${buildQueryString(queryParams)}`,
+    url => fetch(url),
+    { initialData, revalidateOnFocus: false }
+  );
+
+  const { data1, data2, data3, data4, data5, data6, data7, data8 } =
+    (data || []).reduce((
+      { data1, data2, data3, data4, data5, data6, data7, data8 }: Series,
+      dataRow: DataRow,
+      index: number
     ) => {
       const { month, totalRevenue, adspendGlobal, roas, cpa, totalOrders, averageOrderValue, abandonmentRate } = dataRow;
-      const x = moment(month).format('MMM');
       const monthFull = moment(month).format('MMMM');
       return {
-        data1: [ ...data1, { x, y: totalRevenue } ],
-        data2: [ ...data2, { x, y: adspendGlobal } ],
-        data3: [ ...data3, { x, y: roas } ],
-        data4: [ ...data4, { x, y: cpa } ],
+        data1: [ ...data1, { x: month, y: totalRevenue } ],
+        data2: [ ...data2, { x: month, y: adspendGlobal } ],
+        data3: [ ...data3, { x: month, y: roas } ],
+        data4: [ ...data4, { x: month, y: cpa } ],
         data5: [ ...data5, { ...dataRow, month: monthFull, key: `${index+1}`} ],
-        data6: [ ...data6, { x, y: totalOrders } ],
-        data7: [ ...data7, { x, y: averageOrderValue } ],
-        data8: [ ...data8, { x, y: abandonmentRate } ],
+        data6: [ ...data6, { x: month, y: totalOrders } ],
+        data7: [ ...data7, { x: month, y: averageOrderValue } ],
+        data8: [ ...data8, { x: month, y: abandonmentRate } ],
       };
     },
     { data1: [], data2: [], data3: [], data4: [], data5: [], data6: [], data7: [], data8: [] }
@@ -105,10 +116,11 @@ const DashboardPage: React.FC = ({ initialData, initialFrom, initialTo }: any) =
     },
   ];
 
-  const onChange = async ([from, to]: [moment.Moment, moment.Moment]) => {
-    const params = { from: from.format(), to: to.format() };
-    const data = await fetcher('http://localhost:3000/api/dashboard', params);
-    setData(data);
+  const onRangeChange = async ([from, to]: [moment.Moment, moment.Moment]) => {
+    setQueryParams({
+      from: from.startOf('day').format(),
+      to: to.endOf('day').format()
+    });
   };
 
   return (
@@ -137,7 +149,7 @@ const DashboardPage: React.FC = ({ initialData, initialFrom, initialTo }: any) =
                 }}
                 defaultValue={[moment(initialFrom), moment(initialTo)]}
                 className="range-picker"
-                onChange={onChange}
+                onChange={onRangeChange}
               />
             </Col>
           </Row>
@@ -176,10 +188,10 @@ const DashboardPage: React.FC = ({ initialData, initialFrom, initialTo }: any) =
           <Card className="card">
             <Table
               className="table"
-              scroll={{x: true}}
               columns={columns}
               dataSource={data5}
-              pagination={false}/>
+              pagination={false}
+              scroll={{x: true}}/>
           </Card>
         </Col>
 
@@ -222,16 +234,32 @@ const DashboardPage: React.FC = ({ initialData, initialFrom, initialTo }: any) =
 
 export default DashboardPage;
 
-export async function getServerSideProps() {
-  const [ from, to ] = [moment().subtract(12, 'weeks').format(), moment().format()];
+export const getServerSideProps = withAuth(async ({ ctx, user }: { ctx: GetServerSidePropsContext, user: any }) => {
+// export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  // console.log('DashboardPage getServerSideProps');
+  
+  const from = moment().startOf('day').subtract(12, 'months').format();
+  const to = moment().endOf('day').format();
   
   const params = { from, to };
-  const data = await fetcher('http://localhost:3000/api/dashboard', params);
+
+  const data = await fetch(
+    `/context/dashboard${buildQueryString(params)}`,
+    null,
+    ctx
+  );
+
+  if (data?.redirect) {
+    return data;
+  }
+
   return {
     props: {
+      user,
       initialData: data,
       initialFrom: from,
       initialTo: to
     }
   };
-};
+});
+// };

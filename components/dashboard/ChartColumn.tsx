@@ -1,6 +1,7 @@
 import React from 'react';
 import { Column } from '@ant-design/charts';
 import { Typography } from 'antd';
+import moment from 'moment';
 import "./Chart.less";
 
 const { Title } = Typography;
@@ -28,6 +29,7 @@ const ChartColumn: React.FC<Props> = ({ data, height = 131, title, xLabel, yLabe
       label: {
         // autoHide: false,
         // formatter: (month: string) => month.substr(0,3)
+        formatter: (x: string) => moment(x).format('MMM')
       },
     },
     yAxis: {

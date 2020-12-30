@@ -1,46 +1,75 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 import { Card, Col, Row, DatePicker, Table, Typography } from 'antd';
 import moment from 'moment';
-import useSWR from 'swr'
-import { DataRow } from '../api/dashboard';
 import ChartArea from '../../components/dashboard/ChartArea';
 import ChartColumn from '../../components/dashboard/ChartColumn';
+import "./dashboard.less";
+import { GetServerSidePropsContext, NextPage } from 'next';
+import fetch from '../../lib/fetch';
+import { withAuth } from '../../lib/withAuth';
 
 const { RangePicker } = DatePicker;
+const { Title } = Typography;
 
-// class DashboardPage extends React.Component {
-//   state = {};
-//   render() { return (<>dashboard</>); }
-// }
+type Series = { [name: string]: { x: string, y: number }[] };
 
-type Series = {
-  [name: string]: { x: string, y: number }[]
+type DataRow = {
+  month: string,
+  totalRevenue: number,
+  adspendGlobal: number,
+  roas: number,
+  cpa: number,
+  totalOrders: number,
+  averageOrderValue: number,
+  topCountry: string,
+  abandonmentRate: number,
+  vat: number,
+  quantity: number,
+  profit: number,
+  profitPerUnit: number,
 };
 
-const fetcher = async (url: string, params: string) => {
-  const queryString = Object.keys(params).reduce((acc, key) => [
-    ...acc,
-    `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
-  ], []);
-  // return fetch(`${url}?${queryString.join('&')}`).then(res => res.json());
-  const res = await fetch(`${url}?${queryString.join('&')}`);
-  return res.json();
+type DashboardPageProps = {
+  initialData: any[],
+  initialFrom: string,
+  initialTo: string
 };
 
-const DashboardPage: React.FC = () => {
-  console.info('RUN');
-
-  const params = { from: moment().format(), to: moment().format() };
+export const getServerSideProps = withAuth(async ({ ctx, token }: { ctx: GetServerSidePropsContext, token: string }) => {
+  console.log('DashboardPage getServerSideProps');
   
-  const { data, error, mutate } = useSWR(['/api/dashboard', params], fetcher);
+  const from = moment().subtract(12, 'weeks').format();
+  const to = moment().format();
+  
+  const params = { from, to };
 
-  // const onChange = (a) => {
-  //   mutate([{	month: 	"2020-03"	, totalRevenue: 	300000	, adspendGlobal: 	32	, roas: 	5.28	, cpa: 	20.9	, totalOrders: 	3800	, averageOrderValue: 	70	, topCountry: 	"Germany"	, abandonmentRate: 	0.8	, vat:	333908.23	, quantity: 	6890	, profit: 	150987	, profitPerUnit: 	22	}], false);
-  // };
-    
-  if (error) return <div>Failed to load users</div>
-  if (!data) return <div>Loading...</div>
+  const data = await fetch(
+    '/context/dashboard'/* params */,
+    null,
+    ctx
+  );
+
+  if (data.redirect) {
+    return data;
+  }
+
+  return {
+    props: {
+      initialData: data,
+      initialFrom: from,
+      initialTo: to
+    }
+  };
+});
+
+// const DashboardPage: React.FC = ({ initialData, initialFrom, initialTo }: DashboardPageProps) => {
+export default function DashboardPage({
+  initialData,
+  initialFrom,
+  initialTo
+}: DashboardPageProps) {
+  const [data, setData] = useState(initialData);
 
   const { data1, data2, data3, data4, data5, data6, data7, data8 } = data.reduce((
     { data1, data2, data3, data4, data5, data6, data7, data8 }: Series,
@@ -64,8 +93,6 @@ const DashboardPage: React.FC = () => {
     { data1: [], data2: [], data3: [], data4: [], data5: [], data6: [], data7: [], data8: [] }
   );
 
-  console.log('data1', data1);
-
   const columns = [
     {
       title: 'Month',
@@ -83,7 +110,7 @@ const DashboardPage: React.FC = () => {
       key: 'quantity',
     },
     {
-      title: 'AdSpend Global',
+      title: 'AdSpend',
       key: 'adspendGlobal',
       dataIndex: 'adspendGlobal'
     },
@@ -109,6 +136,12 @@ const DashboardPage: React.FC = () => {
     },
   ];
 
+  const onChange = async ([from, to]: [moment.Moment, moment.Moment]) => {
+    const params = { from: from.format(), to: to.format() };
+    const data = await fetch('/context/dashboard'/* params */);
+    setData(data);
+  };
+
   return (
     <>
       <Head>
@@ -117,29 +150,38 @@ const DashboardPage: React.FC = () => {
 
       <Row gutter={[16, 16]}>
         <Col xs={24}>
-          <Typography.Title>Dashboard</Typography.Title>
+          <Row gutter={16} align="middle">
+            <Col flex="none">
+              <Title style={{'marginBottom': 'unset'}}>Dashboard</Title>
+            </Col>
 
-          <RangePicker
-            ranges={{
-              Today: [moment(), moment()],
-              // 'This Month': [moment().startOf('month'), moment().endOf('month')],
-              'Last 7 days': [moment().subtract(7, 'days'), moment()],
-              'Last 30 days': [moment().subtract(30, 'days'), moment()],
-              'Last 12 weeks': [moment().subtract(12, 'weeks'), moment()],
-              'Last 12 months': [moment().subtract(12, 'months'), moment()],
-            }}
-            onChange={onChange}
-          />
+            <Col flex="auto">
+              <RangePicker
+                size="large"
+                ranges={{
+                  Today: [moment(), moment()],
+                  // 'This Month': [moment().startOf('month'), moment().endOf('month')],
+                  'Last 7 days': [moment().subtract(7, 'days'), moment()],
+                  'Last 30 days': [moment().subtract(30, 'days'), moment()],
+                  'Last 12 weeks': [moment().subtract(12, 'weeks'), moment()],
+                  'Last 12 months': [moment().subtract(12, 'months'), moment()],
+                }}
+                defaultValue={[moment(initialFrom), moment(initialTo)]}
+                className="range-picker"
+                onChange={onChange}
+              />
+            </Col>
+          </Row>
         </Col>
 
         <Col md={24} lg={6}>
-          <Card>
+          <Card className="card">
             <ChartArea title="Total Revenue" data={data1}/>
           </Card>
         </Col>
 
         <Col md={24} lg={6}>
-          <Card>
+          <Card className="card">
             <ChartColumn
               data={data2}
               title="Adspend (global)"
@@ -150,20 +192,21 @@ const DashboardPage: React.FC = () => {
         </Col>
 
         <Col md={24} lg={6}>
-          <Card>
+          <Card className="card">
             <ChartArea title="ROAS" data={data3}></ChartArea>
           </Card>
         </Col>
 
         <Col md={24} lg={6}>
-          <Card>
+          <Card className="card">
             <ChartArea title="CPA" data={data4}></ChartArea>
           </Card>
         </Col>
 
         <Col xs={24}>
-          <Card>
+          <Card className="card">
             <Table
+              className="table"
               scroll={{x: true}}
               columns={columns}
               dataSource={data5}
@@ -172,11 +215,11 @@ const DashboardPage: React.FC = () => {
         </Col>
 
         <Col xs={24}>
-          <Typography.Title level={2}>Store Insights</Typography.Title>
+          <Title level={2}>Store Insights</Title>
         </Col>
 
         <Col md={24} lg={6}>
-          <Card>
+          <Card className="card">
             <ChartColumn
               data={data6}
               title="Total Orders"
@@ -187,19 +230,19 @@ const DashboardPage: React.FC = () => {
         </Col>
 
         <Col md={24} lg={6}>
-          <Card>
+          <Card className="card">
             <ChartArea title="Average Order Value" data={data7}></ChartArea>
           </Card>
         </Col>
 
         <Col md={24} lg={6}>
-          <Card>
-            <Typography.Title level={4}>Top countries</Typography.Title>
+          <Card className="card">
+            <Title level={4}>Top countries</Title>
           </Card>
         </Col>
 
         <Col md={24} lg={6}>
-          <Card>
+          <Card className="card">
             <ChartArea title="Abandonment Rate" data={data8}></ChartArea>
           </Card>
         </Col>
@@ -207,5 +250,3 @@ const DashboardPage: React.FC = () => {
     </>
   );
 };
-
-export default DashboardPage;

@@ -7,7 +7,7 @@ import {
   Slider,
   Button,
 } from 'antd'
-import { NextPage } from 'next'
+import { GetServerSidePropsContext, NextPage } from 'next'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -87,5 +87,14 @@ const Home: NextPage = () => {
     </div>
   )
 }
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  return {
+    redirect: {
+      destination: 'dashboard',
+      permanent: false,
+    }
+  };
+};
 
 export default Home;
