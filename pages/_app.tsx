@@ -2,18 +2,21 @@ import type { AppContext, AppProps } from 'next/app'
 import App from 'next/app';
 import Head from "next/head";
 import MainLayout from '../layouts/MainLayout';
+import "./_app.less";
 
 const MyApp = ({ Component, pageProps: { user, ...props } }: AppProps) => {
-  // console.log('MyApp', user);
-
-  // const { user, ...props } = pageProps;
-  
   return (
     // <AuthProvider>
       <MainLayout user={user}>
         <Head>
           <meta name="description" content="hola"></meta>
+          {/* https://github.com/vercel/next.js/pull/14746 */}
+          <link rel="preconnect" href="https://fonts.gstatic.com"/>
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lato:wght@400;700&display=swap" rel="stylesheet"/>
         </Head>
+          <Head>
+            <title>Dive</title>
+          </Head>
           <Component {...props} />
       </MainLayout>
     // </AuthProvider>
@@ -86,7 +89,7 @@ const MyApp = ({ Component, pageProps: { user, ...props } }: AppProps) => {
     
     if(!loggedin && router.pathname !== '/login') {
       ctx.res.writeHead(307, {
-        Location: `login?page_requested=${router.pathname.substring(1)}`,
+        Location: `/login?page_requested=${router.pathname.substring(1)}`,
         // Location: `https://www.google.com`,
         // Add the content-type for SEO considerations
         'Content-Type': 'text/html; charset=utf-8',

@@ -25,15 +25,13 @@ export const withAuth = (getServerSidePropsFn: Function) => (ctx: GetServerSideP
   //   );
   // }
 
-  console.log('token', token);
-  
   const { iat, exp, ...user } = token;
 
   return getServerSidePropsFn({ ctx, user });
 }
 
 const redirectLogin = (ctx: GetServerSidePropsContext) => redirect(
-  `login?page_requested=${ctx.resolvedUrl.substring(1)}`,
+  `/login?page_requested=${encodeURIComponent(ctx.resolvedUrl.substring(1))}`,
   ctx,
   true
 );

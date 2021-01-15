@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import { Card, Col, Row, DatePicker, Table, Typography } from 'antd';
 import moment from 'moment';
-import ChartArea from '../../components/dashboard/ChartArea';
-import ChartColumn from '../../components/dashboard/ChartColumn';
-import "./dashboard.less";
+import ChartArea from '../components/dashboard/ChartArea';
+import ChartColumn from '../components/dashboard/ChartColumn';
+import "./index.less";
 import { GetServerSidePropsContext, NextPage } from 'next';
-import fetch from '../../lib/fetch';
-import { withAuth } from '../../lib/withAuth';
-import { buildQueryString } from '../../lib/buildQueryString';
-import useSWR from '../../lib/useSWR';
-import DashboardTable from '../../components/dashboard/DashboardTable';
+import fetch from '../lib/fetch';
+import { withAuth } from '../lib/withAuth';
+import { buildQueryString } from '../lib/buildQueryString';
+import useSWR from '../lib/useSWR';
+import DashboardTable from '../components/dashboard/DashboardTable';
 
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
@@ -141,7 +141,7 @@ const DashboardPage: NextPage<Props> = ({
 
 export default DashboardPage;
 
-export const getServerSideProps = withAuth(async ({ ctx, token }: { ctx: GetServerSidePropsContext, token: string }) => {
+export const getServerSideProps = withAuth(async ({ ctx, user }: { ctx: GetServerSidePropsContext, user: any }) => {
 // export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   console.log('DashboardPage getServerSideProps');
   
@@ -162,6 +162,7 @@ export const getServerSideProps = withAuth(async ({ ctx, token }: { ctx: GetServ
 
   return {
     props: {
+      user,
       initialData: data,
       initialFrom: from,
       initialTo: to

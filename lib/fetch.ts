@@ -31,7 +31,7 @@ export default async function fetch(
       : window.location.href.split('://')[1].split('/')[1]
     ;
 
-    return redirect(`login?page_requested=${pageRequested}`, ctx, true);
+    return redirect(`login?page_requested=${encodeURIComponent(pageRequested)}`, ctx, true);
   }
   
   return res.json();

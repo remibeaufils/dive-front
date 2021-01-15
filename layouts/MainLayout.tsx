@@ -4,17 +4,11 @@ import "./MainLayout.less";
 
 import { Layout, Menu, Breadcrumb } from 'antd';
 import {
-  DesktopOutlined,
-  PieChartOutlined,
   LogoutOutlined,
-  SafetyOutlined,
-  EyeOutlined,
-  InfoOutlined,
-  LoginOutlined,
+  PlusCircleOutlined,
+  DashboardOutlined,
 } from '@ant-design/icons';
 import fetch from '../lib/fetch';
-import { withAuth } from '../lib/withAuth';
-import { GetServerSidePropsContext } from 'next';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -26,7 +20,7 @@ interface Props {
 const sideBar = user => {
   const router = useRouter();
 
-  const handleLogout = async () => {
+  const logout = async () => {
     await fetch('/auth/logout', { method: 'POST' });
     router.replace('/login');
   };
@@ -36,7 +30,7 @@ const sideBar = user => {
     height: '100vh',
     position: 'fixed',
     left: 0,
-    backgroundColor: user ? null : 'inherit'
+    background: !user ? null : 'linear-gradient(180deg, #8E2DE2 0%, #4A00E0 100%)',
   }}>
     <div className="logo">
       <Link href="/">
@@ -46,47 +40,28 @@ const sideBar = user => {
 
     { user && <div className="menu">
       <Menu theme="dark" selectedKeys={[router.pathname]} mode="inline">
-        {/* <Menu.Item key="/private" icon={<SafetyOutlined />}>
-          <Link href="/private">
-            <a>Private</a>
-          </Link>
-        </Menu.Item>
-        <Menu.Item key="/about" icon={<InfoOutlined />}>
-          <Link href="/about">
-            <a>About</a>
-          </Link>
-        </Menu.Item> */}
-        <Menu.Item key="/dashboard" icon={<PieChartOutlined />}>
-          <Link href="/dashboard">
+        <Menu.Item key="/" icon={<DashboardOutlined />}>
+          <Link href="/">
             <a>Dashboard</a>
           </Link>
         </Menu.Item>
-        {/* <Menu.Item key="/dashboard-sdui" icon={<PieChartOutlined />}>
+
+        {/* <Menu.Item key="/index-sdui" icon={<PieChartOutlined />}>
           <Link href="/dashboard-sdui">
             <a>Dashboard SDUI</a>
           </Link>
-        </Menu.Item>
-        <Menu.Item key="/activity" icon={<DesktopOutlined />}>
-          <Link href="/activity">
-            <a>Activity Tracking</a>
+        </Menu.Item> */}     
+
+        {/* <Menu.Item key="/connectors" icon={<PlusCircleOutlined />}>
+          <Link href="/connectors">
+            <a>Connectors</a>
           </Link>
-        </Menu.Item> */}
-        {/* <Menu.Item key="/login" icon={<LoginOutlined />}>
-          <Link href="/login">
-            <a>Login</a>
-          </Link>
-        </Menu.Item> */}
-        
+        </Menu.Item>    */}
       </Menu>
 
       <Menu theme="dark" selectedKeys={[router.pathname]} mode="inline" className="menu-extra">
-        {/* <Menu.Item key="/about" icon={<InfoOutlined />}>
-          <Link href="/about">
-            <a>About</a>
-          </Link>
-        </Menu.Item> */}
-        <Menu.Item key="/logout" icon={<LogoutOutlined />}>
-          <span onClick={handleLogout}>Logout {user.email}</span>
+        <Menu.Item key="/logout" icon={<LogoutOutlined/>} onClick={logout}>
+          Logout {user.email}
         </Menu.Item>
       </Menu>
     </div> }
@@ -110,7 +85,7 @@ const MainLayout = ({ children, user }: Props) => {
           
           <div
             className="site-layout-background"
-            style={{ padding: 24, minHeight: 360 }}>
+            style={{ padding: '22px 75px', minHeight: 360 }}>
             {children}
           </div>
         </Content>

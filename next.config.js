@@ -45,4 +45,9 @@ module.exports = withLess({
     }
     return config;
   },
+  // https://nextjs.org/docs/advanced-features/i18n-routing#search-engine-optimization
+  i18n: {
+    locales: ['en-US'],
+    defaultLocale: 'en-US'
+  },
 });

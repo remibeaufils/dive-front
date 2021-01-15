@@ -35,9 +35,14 @@ const ChartArea: React.FC<Props> = ({ data, height, title }: Props) => {
       grid: null,
       label: null
     },
-    color: '#092292',
-    point: { size: 3, shape: 'circle', color: '#092292' },
-    areaStyle: () => ({ fill: 'l(270) 0:#ffffff 0.2:#7ec2f3 1:#2b8cff' })
+    // color: '#092292',
+    color: '#7A18F6',
+    point: { size: 3, shape: 'circle', color: '#7A18F6' },
+    // areaStyle: () => ({ fill: 'l(270) 0:#ffffff 0.2:#7ec2f3 1:#2b8cff' })
+    areaStyle: {
+      fill: 'l(270) 0:rgba(122,24,246,0) 0.4:rgba(122,24,246,.56) 0.8361:rgba(122,24,246,1)',
+      // fill: 'rgba(122,24,246,1)',
+    }
   };
 
   return (

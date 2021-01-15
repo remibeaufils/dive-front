@@ -21,7 +21,7 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx", "pages/dashboard/index copy.tsx.old", "pages/dashboard/index.tsx.new"
+    "**/*.tsx", "pages/toDlete/index copy.tsx.old", "pages/toDlete/index.tsx.new"
   ],
   "exclude": [
     "node_modules"

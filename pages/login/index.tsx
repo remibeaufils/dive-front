@@ -14,15 +14,11 @@ export type LoginInputs = {
 }
 
 const LoginPage: NextPage<void> = () => {
-  // console.log('Login');
-
   const [message, setMessage] = useState(null);
-
+  
   const router = useRouter();
 
   const onFinish = async (values: LoginInputs) => {
-    console.log('Received values of form: ', values);
-
     const response = await global.fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
       {
@@ -47,7 +43,8 @@ const LoginPage: NextPage<void> = () => {
     // Before redirecting to requested page => need to get the AUTH token present in cookie and set it in App context to make user data available.
 
     // Read a HttpOnly cookie client side = not possible.
-    router.replace((router.query.page_requested as string) || '/dashboard');
+    
+    router.replace((router.query.page_requested as string) || '/');
 
     // So => navigate reloading page to get AUTH cookie server side.
     // window.location.href = (router.query.page_requested as string) || '/';
@@ -116,7 +113,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   
   if (isLoggedin(ctx)) {
     // console.log('LOGIN REDIRECT');
-    return redirect('/dashboard', ctx);
+    return redirect('/', ctx);
   }
   // console.log('LOGIN NO REDIRECT');
 
