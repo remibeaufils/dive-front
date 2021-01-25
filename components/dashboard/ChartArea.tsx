@@ -26,10 +26,12 @@ const ChartArea: React.FC<Props> = ({ data, height, title }: Props) => {
     // },
     xAxis: {
       line: null,
-      label: {
-        // autoHide: false,
-        formatter: (x: string) => moment(x).format('MMM')
-      },
+      label: null,
+      // label: {
+      //   autoHide: true,
+      //   // formatter: (x: string) => moment(x).format('MMM')
+      //   formatter: (x: string) => x.substring(0, 3)
+      // },
     },
     yAxis: {
       grid: null,

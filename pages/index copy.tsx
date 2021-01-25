@@ -19,13 +19,13 @@ const { Title } = Typography;
 type Series = { [name: string]: { x: string, y: number }[] };
 
 type DataRow = {
-  _id: { period_type: string, period_start: Date },
-  turnover: number,
+  month: string,
+  totalRevenue: number,
   adspendGlobal: number,
   roas: number,
   cpa: number,
-  orders_count: number,
-  orders_avg_value: number,
+  totalOrders: number,
+  averageOrderValue: number,
   topCountry: string,
   conversionRate: number,
   abandonmentRate: number,
@@ -36,7 +36,7 @@ type DataRow = {
 };
 
 type Props = {
-  initialData: { lines: any[], columns: any[] },
+  initialData: any[],
   initialFrom: string,
   initialTo: string
 };
@@ -99,27 +99,78 @@ const DashboardPage: NextPage<Props> = ({
   };
 
   const { data1, data2, data3, data4, data5, data6, data7, data8, data9 } =
-    (data.lines || []).reduce((
+    (data || []).reduce((
       { data1, data2, data3, data4, data5, data6, data7, data8, data9 }: Series,
       dataRow: DataRow,
       index: number
     ) => {
-      const { _id, turnover, adspendGlobal, roas, cpa, orders_count, orders_avg_value, conversionRate, abandonmentRate } = dataRow;
-      // const monthFull = moment(month).format('MMMM');
+      const { month, totalRevenue, adspendGlobal, roas, cpa, totalOrders, averageOrderValue, conversionRate, abandonmentRate } = dataRow;
+      const monthFull = moment(month).format('MMMM');
       return {
-        data1: [ ...data1, { x: _id.period_start, y: turnover } ],
-        // data2: [ ...data2, { x: month, y: adspendGlobal } ],
-        // data3: [ ...data3, { x: month, y: roas } ],
-        // data4: [ ...data4, { x: month, y: cpa } ],
-        // data5: [ ...data5, { ...dataRow, month: monthFull, key: `${index+1}`} ],
-        data6: [ ...data6, { x: _id.period_start, y: orders_count } ],
-        data7: [ ...data7, { x: _id.period_start, y: orders_avg_value } ],
-        // data8: [ ...data8, { x: month, y: conversionRate } ],
-        // data9: [ ...data9, { x: month, y: abandonmentRate } ],
+        data1: [ ...data1, { x: month, y: totalRevenue } ],
+        data2: [ ...data2, { x: month, y: adspendGlobal } ],
+        data3: [ ...data3, { x: month, y: roas } ],
+        data4: [ ...data4, { x: month, y: cpa } ],
+        data5: [ ...data5, { ...dataRow, month: monthFull, key: `${index+1}`} ],
+        data6: [ ...data6, { x: month, y: totalOrders } ],
+        data7: [ ...data7, { x: month, y: averageOrderValue } ],
+        data8: [ ...data8, { x: month, y: conversionRate } ],
+        data9: [ ...data9, { x: month, y: abandonmentRate } ],
       };
     },
     { data1: [], data2: [], data3: [], data4: [], data5: [], data6: [], data7: [], data8: [], data9: [] }
   );
+
+  const columns: ColumnsType<DataRow> = [
+    {
+      title: 'Month',
+      dataIndex: 'month',
+      key: 'month',
+      align: 'center',
+    },
+    {
+      title: 'Turnover (VAT excluded) in USD',
+      dataIndex: 'vat',
+      key: 'vat',
+      align: 'right',
+    },
+    {
+      title: 'Quantity',
+      dataIndex: 'quantity',
+      key: 'quantity',
+      align: 'right',
+    },
+    {
+      title: 'AdSpend',
+      key: 'adspendGlobal',
+      dataIndex: 'adspendGlobal',
+      align: 'right',
+    },
+    {
+      title: 'ROAS',
+      key: 'roas',
+      dataIndex: 'roas',
+      align: 'right',
+    },
+    {
+      title: 'CPA',
+      key: 'cpa',
+      dataIndex: 'cpa',
+      align: 'right',
+    },
+    {
+      title: 'Profit (USD)',
+      key: 'profit',
+      dataIndex: 'profit',
+      align: 'right',
+    },
+    {
+      title: 'Profit per unit (USD)',
+      key: 'profitPerUnit',
+      dataIndex: 'profitPerUnit',
+      align: 'right',
+    },
+  ];
 
   return (
     <>
@@ -160,7 +211,7 @@ const DashboardPage: NextPage<Props> = ({
           </Card>
         </Col>
 
-        {/* <Col md={24} lg={6}>
+        <Col md={24} lg={6}>
           <Card className="card">
             <ChartColumn
               data={data2}
@@ -181,34 +232,24 @@ const DashboardPage: NextPage<Props> = ({
           <Card className="card">
             <ChartLine title="CPA" data={data4}></ChartLine>
           </Card>
-        </Col> */}
+        </Col>
 
         <Col xs={24}>
           <Card className="card">
-            {/* <Table<DataRow>
+            <Table<DataRow>
               className="table"
-              dataSource={data.lines}
+              dataSource={data5}
               pagination={false}
-              rowKey={record => record._id.period_start}
-              scroll={{x: true, y: 750 }}>
-              {data.columns.map(({ align, dataIndex, key, title, width }: ColumnType<DataRow>, index) => (
+              scroll={{x: true}}>
+              {columns.map(({ align, dataIndex, key, title }: ColumnType<DataRow>) => (
                 <Table.Column<DataRow>
                   align={align}
                   dataIndex={dataIndex}
-                  key={index}
+                  key={key}
                   title={title}
-                  width={width}
                 />
               ))}
-              </Table> */}
-
-            <Table<DataRow>
-              className="table"
-              columns={data.columns}
-              dataSource={data.lines}
-              pagination={false}
-              rowKey="periodF"
-              scroll={{x: true, y: 800 }} />
+              </Table>
           </Card>
         </Col>
 
@@ -235,7 +276,7 @@ const DashboardPage: NextPage<Props> = ({
           </Card>
         </Col>
 
-        {/* <Col md={24} lg={6}>
+        <Col md={24} lg={6}>
           <Card className="card">
             <ChartLine title="Conversion Rate" data={data8}></ChartLine>
           </Card>
@@ -245,7 +286,7 @@ const DashboardPage: NextPage<Props> = ({
           <Card className="card">
             <ChartArea title="Abandonment Rate" data={data9}></ChartArea>
           </Card>
-        </Col> */}
+        </Col>
       </Row>
     </>
   );
