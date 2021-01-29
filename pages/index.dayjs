@@ -1,0 +1,64 @@
+import React from 'react';
+import Head from 'next/head';
+import { Card, Col, Row, Table, Typography } from 'antd';
+// import moment from 'moment';
+import ChartArea from '../components/dashboard/ChartArea';
+import ChartColumn from '../components/dashboard/ChartColumn';
+import "./index.less";
+import { GetServerSidePropsContext, NextPage } from 'next';
+import fetch from '../lib/fetch';
+import { withAuth } from '../lib/withAuth';
+import { buildQueryString } from '../lib/buildQueryString';
+import { useRouter } from 'next/router';
+import ChartLine from '../components/dashboard/ChartLine';
+import { ColumnsType, ColumnType } from 'antd/lib/table';
+import dayjs from 'dayjs';
+import DatePicker from '../components/RangePicker';
+
+const { RangePicker } = DatePicker;
+
+const DashboardPage: NextPage = () => {
+
+  return (
+    <>
+      <Head>
+        <title>Dashboard</title>
+      </Head>
+      
+      <Row gutter={[16, 16]}>
+        <Col xs={24}>
+          <Row gutter={16} align="middle">
+
+            <Col flex="auto">
+              <RangePicker
+                size="large"
+                ranges={{
+                  Today: [dayjs(), dayjs()],
+                  // 'This Month': [moment().startOf('month'), moment().endOf('month')],
+                  'Last 7 days': [dayjs().subtract(7, 'days'), dayjs()],
+                  'Last 30 days': [dayjs().subtract(30, 'days'), dayjs()],
+                  'Last 12 weeks': [dayjs().subtract(12, 'weeks'), dayjs()],
+                  'Last 12 months': [dayjs().subtract(12, 'months'), dayjs()],
+                }}
+                // defaultValue={[moment(initialFrom), moment(initialTo)]}
+                className="range-picker"
+                // onChange={onRangeChange}
+                clearIcon={false}
+              />
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+    </>
+  );
+};
+
+export default DashboardPage;
+
+export const getServerSideProps = withAuth(async ({ ctx, user }: { ctx: GetServerSidePropsContext, user: any }) => {
+  return {
+    props: {
+      user,
+    }
+  };
+});

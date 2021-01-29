@@ -4,6 +4,7 @@ const lessToJS = require('less-vars-to-js');
 const fs = require('fs');
 const path = require('path');
 const { IgnorePlugin } = require('webpack');
+const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
 
 const themeVariables = lessToJS(
   fs.readFileSync(path.resolve(__dirname, './assets/styles/antd-custom.less'), 'utf8')
@@ -41,8 +42,10 @@ module.exports = withLess({
         '@ant-design/icons/lib/dist$': path.resolve(`./icons/index.js`),
       };
       /* strips out moment locales */
-      config.plugins.push(new IgnorePlugin(/^\.\/locale$/, /moment$/));
+      // Not useful using AntdDayjsWebpackPlugin that replaces moment by dayjs.
+      // config.plugins.push(new IgnorePlugin(/^\.\/locale$/, /moment$/));
     }
+    config.plugins.push(new AntdDayjsWebpackPlugin());
     return config;
   },
   // https://nextjs.org/docs/advanced-features/i18n-routing#search-engine-optimization

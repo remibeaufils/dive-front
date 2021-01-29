@@ -12,7 +12,7 @@ const MyApp = ({ Component, pageProps: { user, ...props } }: AppProps) => {
           <meta name="description" content="hola"></meta>
           {/* https://github.com/vercel/next.js/pull/14746 */}
           <link rel="preconnect" href="https://fonts.gstatic.com"/>
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lato:wght@400;700&display=swap" rel="stylesheet"/>
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet"/>
         </Head>
           <Head>
             <title>Dive</title>

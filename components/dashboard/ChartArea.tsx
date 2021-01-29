@@ -1,43 +1,47 @@
 import React from 'react';
 import { Area } from '@ant-design/charts';
-import { Typography } from 'antd';
 import { AreaConfig } from '@ant-design/charts/es/area';
 import moment from 'moment';
 import "./Chart.less";
-
-const { Title } = Typography;
+import ChartEvolution from './ChartEvolution';
 
 type Props = {
   data: any,
+  total: number,
+  evolution: string,
   height?: number,
   title?: string,
+  yLabel?: string,
 }
 
-const ChartArea: React.FC<Props> = ({ data, height, title }: Props) => {
+const ChartArea: React.FC<Props> = ({ data, evolution, height, title, total, yLabel }: Props) => {
+  // https://g2.antv.vision/en/docs/manual/tutorial/scale
   const config: AreaConfig = {
     data,
     height: height || 131,
+    // autoFit: true,
     smooth: true,
-    // autoFit: false,
     xField: 'x',
     yField: 'y',
-    // meta: {
-    //   y: { alias: 'yLabel' }
-    // },
+    meta: {
+      y: { alias: yLabel }
+    },
     xAxis: {
+      // tickInterval: 3,
+      // mask: 'YYYY-MM-DDTHH:MM:SSZ',
+      type: 'timeCat',
+      // type: 'cat',
+      nice: true,
       line: null,
-      label: null,
-      // label: {
-      //   autoHide: true,
-      //   // formatter: (x: string) => moment(x).format('MMM')
-      //   formatter: (x: string) => x.substring(0, 3)
-      // },
+      label: {
+        // autoHide: true, // default = true
+        formatter: (x: string) => moment(x).format('MMM, DD')
+      },
     },
     yAxis: {
       grid: null,
       label: null
     },
-    // color: '#092292',
     color: '#7A18F6',
     point: { size: 3, shape: 'circle', color: '#7A18F6' },
     // areaStyle: () => ({ fill: 'l(270) 0:#ffffff 0.2:#7ec2f3 1:#2b8cff' })
@@ -51,6 +55,11 @@ const ChartArea: React.FC<Props> = ({ data, height, title }: Props) => {
     <>
       {/* <Title level={5} className="title">{title}</Title> */}
       <p className="title">{title}</p>
+      <p className="total">
+        {total}
+        &nbsp;
+        <ChartEvolution evolution={evolution}/>
+      </p>
       <Area {...config}/>
     </>
   )

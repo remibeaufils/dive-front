@@ -1,7 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
 import { Card, Col, Row, DatePicker, Table, Typography } from 'antd';
-import moment from 'moment';
 import ChartArea from '../components/dashboard/ChartArea';
 import ChartColumn from '../components/dashboard/ChartColumn';
 import "./index.less";
@@ -11,32 +10,17 @@ import { withAuth } from '../lib/withAuth';
 import { buildQueryString } from '../lib/buildQueryString';
 import { useRouter } from 'next/router';
 import ChartLine from '../components/dashboard/ChartLine';
-import { ColumnsType, ColumnType } from 'antd/lib/table';
+import moment from 'moment';
+
+// WORKS with AntdDayjsWebpackPlugin that replaces moment.
+// import 'dayjs/locale/zh-cn';
+// moment.locale('zh-cn')
+// console.log(moment().format('dddd'));
 
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
-
-type Series = { [name: string]: { x: string, y: number }[] };
-
-type DataRow = {
-  _id: { period_type: string, period_start: Date },
-  turnover: number,
-  adspendGlobal: number,
-  roas: number,
-  cpa: number,
-  orders_count: number,
-  orders_avg_value: number,
-  topCountry: string,
-  conversionRate: number,
-  abandonmentRate: number,
-  vat: number,
-  quantity: number,
-  profit: number,
-  profitPerUnit: number,
-};
-
 type Props = {
-  initialData: { lines: any[], columns: any[] },
+  initialData: any,
   initialFrom: string,
   initialTo: string
 };
@@ -80,16 +64,48 @@ const DashboardPage: NextPage<Props> = ({
   //   });
   // }, [router.query]);
   
-  const data = initialData;
+  // const data = initialData;
+  const { data1, data2, data3, data4, data5, data6, data7 } = initialData.data;
+  const columns = initialData.columns;
+  const [from, to] = [moment(initialFrom), moment(initialTo)];
 
   const router = useRouter();
 
   const onRangeChange = async ([from, to]: [moment.Moment, moment.Moment]) => {
+    // fixme: should respect store timezone.
+    const startOfFrom = from.startOf('day').format();
+    const endOfTo = to.endOf('day').format();
+
+    // WORKS with AntdDayjsWebpackPlugin that replaces moment.
+    // import dayjs from 'dayjs'
+    // import utc from 'dayjs/plugin/utc';
+    // import timezone from 'dayjs/plugin/timezone';
+    // dayjs.extend(utc);
+    // dayjs.extend(timezone);
+    // const now = dayjs();
+    // const tz = 'America/New_York';
+    // let test = now;
+    // console.log(test, test.format());
+    // test = dayjs.tz(now);
+    // console.log(test, test.format());
+    // test = dayjs.tz(now, tz);
+    // console.log(test, test.format());
+    // dayjs.tz.setDefault(tz);
+    // test = dayjs.tz(now);
+    // console.log(test, test.format());
+
+    // WORKS when AntdDayjsWebpackPlugin not included.
+    // import 'moment-timezone';
+    // moment.tz.setDefault('America/New_York');
+    // console.log(moment().format());
+    
+    // console.log('onRangeChange', from.format(), to.format(), startOfFrom, endOfTo);
+    
     router.push({
       pathname: '/',
       query: {
-        from: from.startOf('day').format(),
-        to: to.endOf('day').format()
+        from: startOfFrom,
+        to: endOfTo
       }
     });
     // router.push(
@@ -97,29 +113,6 @@ const DashboardPage: NextPage<Props> = ({
     //   `test?from=${encodeURIComponent(from.startOf('day').format())}&to=${encodeURIComponent(to.endOf('day').format())}`,
     // );
   };
-
-  const { data1, data2, data3, data4, data5, data6, data7, data8, data9 } =
-    (data.lines || []).reduce((
-      { data1, data2, data3, data4, data5, data6, data7, data8, data9 }: Series,
-      dataRow: DataRow,
-      index: number
-    ) => {
-      const { _id, turnover, adspendGlobal, roas, cpa, orders_count, orders_avg_value, conversionRate, abandonmentRate } = dataRow;
-      // const monthFull = moment(month).format('MMMM');
-      return {
-        data1: [ ...data1, { x: _id.period_start, y: turnover } ],
-        // data2: [ ...data2, { x: month, y: adspendGlobal } ],
-        // data3: [ ...data3, { x: month, y: roas } ],
-        // data4: [ ...data4, { x: month, y: cpa } ],
-        // data5: [ ...data5, { ...dataRow, month: monthFull, key: `${index+1}`} ],
-        data6: [ ...data6, { x: _id.period_start, y: orders_count } ],
-        data7: [ ...data7, { x: _id.period_start, y: orders_avg_value } ],
-        // data8: [ ...data8, { x: month, y: conversionRate } ],
-        // data9: [ ...data9, { x: month, y: abandonmentRate } ],
-      };
-    },
-    { data1: [], data2: [], data3: [], data4: [], data5: [], data6: [], data7: [], data8: [], data9: [] }
-  );
 
   return (
     <>
@@ -145,7 +138,8 @@ const DashboardPage: NextPage<Props> = ({
                   'Last 12 weeks': [moment().subtract(12, 'weeks'), moment()],
                   'Last 12 months': [moment().subtract(12, 'months'), moment()],
                 }}
-                defaultValue={[moment(initialFrom), moment(initialTo)]}
+                // defaultValue={[from, to]}
+                value={[from, to]}
                 className="range-picker"
                 onChange={onRangeChange}
                 clearIcon={false}
@@ -154,34 +148,49 @@ const DashboardPage: NextPage<Props> = ({
           </Row>
         </Col>
 
-        <Col md={24} lg={6}>
+        <Col xs={24} sm={12} md={8} xl={6}>
           <Card className="card">
-            <ChartArea title="Total Revenue" data={data1}/>
+            <ChartArea
+              data={data1.data}
+              total={data1.total_f}
+              evolution={data1.evolution}
+              title="Total Revenue"
+              yLabel="Turnover"/>
           </Card>
         </Col>
 
-        {/* <Col md={24} lg={6}>
+        <Col xs={24} sm={12} md={8} xl={6}>
           <Card className="card">
             <ChartColumn
-              data={data2}
+              data={data2.data}
+              total={data2.total_f}
+              evolution={data2.evolution}
               title="Adspend (global)"
-              xLabel="Month"
-              yLabel="Amount"
-            />
+              yLabel="Adspend"/>
           </Card>
         </Col>
 
-        <Col md={24} lg={6}>
+        <Col xs={24} sm={12} md={8} xl={6}>
           <Card className="card">
-            <ChartLine title="ROAS" data={data3}></ChartLine>
+            <ChartLine
+              data={data3.data}
+              total={data3.total_f}
+              evolution={data3.evolution}
+              title="ROAS"
+              yLabel="ROAS"/>
           </Card>
         </Col>
 
-        <Col md={24} lg={6}>
+        <Col xs={24} sm={12} md={8} xl={6}>
           <Card className="card">
-            <ChartLine title="CPA" data={data4}></ChartLine>
+            <ChartLine
+              data={data4.data}
+              total={data4.total_f}
+              evolution={data4.evolution}
+              title="CPA"
+              yLabel="CPA"/>
           </Card>
-        </Col> */}
+        </Col>
 
         <Col xs={24}>
           <Card className="card">
@@ -202,46 +211,56 @@ const DashboardPage: NextPage<Props> = ({
               ))}
               </Table> */}
 
-            <Table<DataRow>
+            {/* <Table<DataRow> */}
+            <Table
               className="table"
-              columns={data.columns}
-              dataSource={data.lines}
+              columns={columns}
+              dataSource={data5.data.sort(
+                (a, b) => (a._id.period_start > b._id.period_start) ? -1 : 1)
+              }
               pagination={false}
-              rowKey="periodF"
-              scroll={{x: true, y: 800 }} />
+              rowKey="period_f"
+              scroll={{x: true, y: 760 }}
+              size="middle" />
           </Card>
         </Col>
 
         <Col xs={24}>
-          <Title level={2} style={{ fontWeight: 'normal' }}>
+          <Title level={2}>
             Store Insights
           </Title>
         </Col>
 
-        <Col md={24} lg={6}>
+        <Col xs={24} sm={12} md={8} xl={6}>
           <Card className="card">
             <ChartColumn
-              data={data6}
+              data={data6.data}
+              total={data6.total_f}
+              evolution={data6.evolution}
               title="Total Orders"
-              xLabel="Month"
               yLabel="Total"
             />
           </Card>
         </Col>
 
-        <Col md={24} lg={6}>
+        <Col xs={24} sm={12} md={8} xl={6}>
           <Card className="card">
-            <ChartArea title="Average Order Value" data={data7}></ChartArea>
+            <ChartArea
+              data={data7.data}
+              total={data7.total_f}
+              evolution={data7.evolution}
+              title="Average Order Value"
+              yLabel="AOV"/>
           </Card>
         </Col>
 
-        {/* <Col md={24} lg={6}>
+        {/* <Col xs={24} sm={12} md={8} xl={6}>
           <Card className="card">
             <ChartLine title="Conversion Rate" data={data8}></ChartLine>
           </Card>
         </Col>
 
-        <Col md={24} lg={6}>
+        <Col xs={24} sm={12} md={8} xl={6}>
           <Card className="card">
             <ChartArea title="Abandonment Rate" data={data9}></ChartArea>
           </Card>
@@ -253,27 +272,11 @@ const DashboardPage: NextPage<Props> = ({
 
 export default DashboardPage;
 
-export const getServerSideProps = withAuth(async ({ ctx, user }: { ctx: GetServerSidePropsContext, user: any }) => {
-  let from: string, to: string;
-
-  try {
-    from = ctx.query.from
-    ? moment(ctx.query.from).startOf('day').format()
-    : moment().startOf('day').subtract(6, 'months').format();
-  } catch (e) {
-    from = moment().startOf('day').subtract(6, 'months').format();
-  }
-
-  try {
-    to = moment(ctx.query.to).startOf('day').format();
-  } catch (e) {
-    to = moment().endOf('day').format();
-  }
+export const getServerSideProps = withAuth(async ({ ctx, user }: { ctx: GetServerSidePropsContext, user: any }) => {  
+  const { from = '', to = '' } = ctx.query;
   
-  const params = { from, to };
-
   const data = await fetch(
-    `/context/dashboard${buildQueryString(params)}`,
+    `/context/dashboard${buildQueryString({ from, to })}`,
     null,
     ctx
   );
@@ -286,8 +289,8 @@ export const getServerSideProps = withAuth(async ({ ctx, user }: { ctx: GetServe
     props: {
       user,
       initialData: data,
-      initialFrom: from,
-      initialTo: to
+      initialFrom: data.from,
+      initialTo: data.to
     }
   };
 });
