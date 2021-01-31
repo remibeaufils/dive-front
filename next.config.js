@@ -3,7 +3,7 @@ const withLess = require('@zeit/next-less');
 const lessToJS = require('less-vars-to-js');
 const fs = require('fs');
 const path = require('path');
-const { IgnorePlugin } = require('webpack');
+// const { IgnorePlugin } = require('webpack');
 const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
 
 const themeVariables = lessToJS(

@@ -1,17 +1,17 @@
-import React from 'react';
-import { Area } from '@ant-design/charts';
-import { AreaConfig } from '@ant-design/charts/es/area';
-import moment from 'moment';
-import "./Chart.less";
-import ChartEvolution from './ChartEvolution';
+import React from 'react'
+import { Area } from '@ant-design/charts'
+import { AreaConfig } from '@ant-design/charts/es/area'
+import moment from 'moment'
+import './Chart.less'
+import ChartEvolution from './ChartEvolution'
 
 type Props = {
-  data: any,
-  total: number,
-  evolution: string,
-  height?: number,
-  title?: string,
-  yLabel?: string,
+  data: any
+  total: number
+  evolution: string
+  height?: number
+  title?: string
+  yLabel?: string
 }
 
 const ChartArea: React.FC<Props> = ({ data, evolution, height, title, total, yLabel }: Props) => {
@@ -24,7 +24,7 @@ const ChartArea: React.FC<Props> = ({ data, evolution, height, title, total, yLa
     xField: 'x',
     yField: 'y',
     meta: {
-      y: { alias: yLabel }
+      y: { alias: yLabel },
     },
     xAxis: {
       // tickInterval: 3,
@@ -35,12 +35,12 @@ const ChartArea: React.FC<Props> = ({ data, evolution, height, title, total, yLa
       line: null,
       label: {
         // autoHide: true, // default = true
-        formatter: (x: string) => moment(x).format('MMM, DD')
+        formatter: (x: string) => moment(x).format('MMM, DD'),
       },
     },
     yAxis: {
       grid: null,
-      label: null
+      label: null,
     },
     color: '#7A18F6',
     point: { size: 3, shape: 'circle', color: '#7A18F6' },
@@ -48,8 +48,8 @@ const ChartArea: React.FC<Props> = ({ data, evolution, height, title, total, yLa
     areaStyle: {
       fill: 'l(270) 0:rgba(122,24,246,0) 0.4:rgba(122,24,246,.56) 0.8361:rgba(122,24,246,1)',
       // fill: 'rgba(122,24,246,1)',
-    }
-  };
+    },
+  }
 
   return (
     <>
@@ -58,11 +58,11 @@ const ChartArea: React.FC<Props> = ({ data, evolution, height, title, total, yLa
       <p className="total">
         {total}
         &nbsp;
-        <ChartEvolution evolution={evolution}/>
+        <ChartEvolution evolution={evolution} />
       </p>
-      <Area {...config}/>
+      <Area {...config} />
     </>
   )
-};
+}
 
-export default ChartArea;
+export default ChartArea

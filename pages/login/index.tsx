@@ -1,12 +1,11 @@
-import { Form, Input, Button, Checkbox, Card } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { GetServerSidePropsContext, NextPage } from "next";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { isLoggedin } from "../../lib/auth";
-import { redirect } from "../../lib/redirect";
-import "./Login.less";
-import Title from 'antd/lib/typography/Title';
+import { Form, Input, Button, Card } from 'antd'
+import { UserOutlined, LockOutlined } from '@ant-design/icons'
+import { GetServerSideProps, NextPage } from 'next'
+import { useRouter } from 'next/router'
+import { isLoggedin } from '../../lib/auth'
+import { redirect } from '../../lib/redirect'
+import './Login.less'
+import Title from 'antd/lib/typography/Title'
 
 export type LoginInputs = {
   email?: string
@@ -14,51 +13,48 @@ export type LoginInputs = {
 }
 
 const LoginPage: NextPage<void> = () => {
-  const [message, setMessage] = useState(null);
-  
-  const router = useRouter();
+  // const [message, setMessage] = useState(null)
 
-  const onFinish = async (values: LoginInputs) => {
-    const response = await global.fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-        }),
-      },
-    );
+  const router = useRouter()
 
-    const data = await response.json();
+  const onFinish = async (values: LoginInputs): Promise<void> => {
+    const response = await global.fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        email: values.email,
+        password: values.password,
+      }),
+    })
 
-    setMessage(data);
+    // const data = await response.json()
+
+    // setMessage(data)
 
     if (!response.ok) {
-      return;
+      return
     }
 
     // Before redirecting to requested page => need to get the AUTH token present in cookie and set it in App context to make user data available.
 
     // Read a HttpOnly cookie client side = not possible.
-    
-    router.replace((router.query.page_requested as string) || '/');
+
+    router.replace((router.query.page_requested as string) || '/')
 
     // So => navigate reloading page to get AUTH cookie server side.
     // window.location.href = (router.query.page_requested as string) || '/';
 
     // À voir si nécéssaire si getServerSideProps utilisé dans tous les composants private car ça force le ssr.
-  };
-  
+  }
+
   return (
     <div className="container">
       <Card className="login-card">
         <Title level={2} style={{ marginBottom: '56px', textAlign: 'center' }}>
           Login
         </Title>
-        
+
         <Form
           name="normal_login"
           layout="vertical"
@@ -103,19 +99,22 @@ const LoginPage: NextPage<void> = () => {
         </Form>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default LoginPage
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+// export const getServerSideProps = async (
+//   ctx: GetServerSidePropsContext
+// ): Promise<GetServerSidePropsResult<any>> => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   // console.log('LoginPage getServerSideProps');
-  
+
   if (isLoggedin(ctx)) {
     // console.log('LOGIN REDIRECT');
-    return redirect('/', ctx);
+    redirect('/', ctx)
+  } else {
+    // console.log('LOGIN NO REDIRECT');
+    return { props: {} }
   }
-  // console.log('LOGIN NO REDIRECT');
-
-  return { props: {} }
-};
+}

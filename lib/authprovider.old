@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-const AuthContext = createContext()
+const AuthContext = createContext(undefined)
 
 function AuthProvider({ children }) {
   console.log('AuthProvider');

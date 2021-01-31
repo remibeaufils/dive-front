@@ -1,27 +1,29 @@
-import type { AppContext, AppProps } from 'next/app'
-import App from 'next/app';
-import Head from "next/head";
-import MainLayout from '../layouts/MainLayout';
-import "./_app.less";
+import type { AppProps } from 'next/app'
+import Head from 'next/head'
+import MainLayout from '../layouts/MainLayout'
+import './_app.less'
 
 const MyApp = ({ Component, pageProps: { user, ...props } }: AppProps) => {
   return (
     // <AuthProvider>
-      <MainLayout user={user}>
-        <Head>
-          <meta name="description" content="hola"></meta>
-          {/* https://github.com/vercel/next.js/pull/14746 */}
-          <link rel="preconnect" href="https://fonts.gstatic.com"/>
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet"/>
-        </Head>
-          <Head>
-            <title>Dive</title>
-          </Head>
-          <Component {...props} />
-      </MainLayout>
+    <MainLayout user={user}>
+      <Head>
+        <meta name="description" content="hola"></meta>
+        {/* https://github.com/vercel/next.js/pull/14746 */}
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Lato:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
+      <Head>
+        <title>Dive</title>
+      </Head>
+      <Component {...props} />
+    </MainLayout>
     // </AuthProvider>
-  );
-};
+  )
+}
 
 // Only uncomment this method if you have blocking data requirements for
 // every single page in your application. This disables the ability to
@@ -129,4 +131,4 @@ const MyApp = ({ Component, pageProps: { user, ...props } }: AppProps) => {
     : { ...appProps };
 } */
 
-export default MyApp;
+export default MyApp

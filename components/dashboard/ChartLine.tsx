@@ -1,17 +1,17 @@
-import React from 'react';
-import { Line } from '@ant-design/charts';
-import moment from 'moment';
-import "./Chart.less";
-import { LineConfig } from '@ant-design/charts/es/line';
-import ChartEvolution from './ChartEvolution';
+import React from 'react'
+import { Line } from '@ant-design/charts'
+import moment from 'moment'
+import './Chart.less'
+import { LineConfig } from '@ant-design/charts/es/line'
+import ChartEvolution from './ChartEvolution'
 
 type Props = {
-  data: any,
-  total: number,
-  evolution: string,
-  height?: number,
-  title?: string,
-  yLabel?: string,
+  data: any
+  total: number
+  evolution: string
+  height?: number
+  title?: string
+  yLabel?: string
 }
 
 const ChartLine: React.FC<Props> = ({ data, evolution, height, title, total, yLabel }: Props) => {
@@ -23,7 +23,7 @@ const ChartLine: React.FC<Props> = ({ data, evolution, height, title, total, yLa
     xField: 'x',
     yField: 'y',
     meta: {
-      y: { alias: yLabel }
+      y: { alias: yLabel },
     },
     xAxis: {
       type: 'timeCat',
@@ -31,18 +31,18 @@ const ChartLine: React.FC<Props> = ({ data, evolution, height, title, total, yLa
       nice: true,
       label: {
         // autoHide: false,
-        formatter: (x: string) => moment(x).format('MMM, DD')
+        formatter: (x: string) => moment(x).format('MMM, DD'),
       },
     },
     yAxis: {
       grid: null,
       nice: true,
-      label: null
+      label: null,
     },
     // color: '#092292',
     color: '#7A18F6',
     point: { size: 3, shape: 'circle', color: '#7A18F6' },
-  };
+  }
 
   return (
     <>
@@ -51,11 +51,11 @@ const ChartLine: React.FC<Props> = ({ data, evolution, height, title, total, yLa
       <p className="total">
         {total}
         &nbsp;
-        <ChartEvolution evolution={evolution}/>
+        <ChartEvolution evolution={evolution} />
       </p>
-      <Line {...config}/>
+      <Line {...config} />
     </>
   )
-};
+}
 
-export default ChartLine;
+export default ChartLine

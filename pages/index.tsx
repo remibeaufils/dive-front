@@ -1,35 +1,31 @@
-import React from 'react';
-import Head from 'next/head';
-import { Card, Col, Row, DatePicker, Table, Typography } from 'antd';
-import ChartArea from '../components/dashboard/ChartArea';
-import ChartColumn from '../components/dashboard/ChartColumn';
-import "./index.less";
-import { GetServerSidePropsContext, NextPage } from 'next';
-import fetch from '../lib/fetch';
-import { withAuth } from '../lib/withAuth';
-import { buildQueryString } from '../lib/buildQueryString';
-import { useRouter } from 'next/router';
-import ChartLine from '../components/dashboard/ChartLine';
-import moment from 'moment';
+import React from 'react'
+import Head from 'next/head'
+import { Card, Col, Row, DatePicker, Table, Typography } from 'antd'
+import ChartArea from '../components/dashboard/ChartArea'
+import ChartColumn from '../components/dashboard/ChartColumn'
+import './index.less'
+import { GetServerSideProps, GetServerSidePropsContext, NextPage } from 'next'
+import fetch from '../lib/fetch'
+import { withAuth } from '../lib/withAuth'
+import { buildQueryString } from '../lib/buildQueryString'
+import { useRouter } from 'next/router'
+import ChartLine from '../components/dashboard/ChartLine'
+import moment from 'moment'
 
 // WORKS with AntdDayjsWebpackPlugin that replaces moment.
 // import 'dayjs/locale/zh-cn';
 // moment.locale('zh-cn')
 // console.log(moment().format('dddd'));
 
-const { RangePicker } = DatePicker;
-const { Title } = Typography;
+const { RangePicker } = DatePicker
+const { Title } = Typography
 type Props = {
-  initialData: any,
-  initialFrom: string,
+  initialData: any
+  initialFrom: string
   initialTo: string
-};
+}
 
-const DashboardPage: NextPage<Props> = ({
-  initialData,
-  initialFrom,
-  initialTo
-}) => {
+const DashboardPage: NextPage<Props> = ({ initialData, initialFrom, initialTo }) => {
   // const [queryParams, setQueryParams] = useState({ from: initialFrom, to: initialTo });
 
   // const { data } = useSWR(
@@ -63,18 +59,18 @@ const DashboardPage: NextPage<Props> = ({
   //     to: router.query.to as string
   //   });
   // }, [router.query]);
-  
+
   // const data = initialData;
-  const { data1, data2, data3, data4, data5, data6, data7 } = initialData.data;
-  const columns = initialData.columns;
-  const [from, to] = [moment(initialFrom), moment(initialTo)];
+  const { data1, data2, data3, data4, data5, data6, data7 } = initialData.data
+  const columns = initialData.columns
+  const [from, to] = [moment(initialFrom), moment(initialTo)]
 
-  const router = useRouter();
+  const router = useRouter()
 
-  const onRangeChange = async ([from, to]: [moment.Moment, moment.Moment]) => {
+  const onRangeChange = async ([from, to]: [moment.Moment, moment.Moment]): Promise<void> => {
     // fixme: should respect store timezone.
-    const startOfFrom = from.startOf('day').format();
-    const endOfTo = to.endOf('day').format();
+    const startOfFrom = from.startOf('day').format()
+    const endOfTo = to.endOf('day').format()
 
     // WORKS with AntdDayjsWebpackPlugin that replaces moment.
     // import dayjs from 'dayjs'
@@ -98,28 +94,28 @@ const DashboardPage: NextPage<Props> = ({
     // import 'moment-timezone';
     // moment.tz.setDefault('America/New_York');
     // console.log(moment().format());
-    
+
     // console.log('onRangeChange', from.format(), to.format(), startOfFrom, endOfTo);
-    
+
     router.push({
       pathname: '/',
       query: {
         from: startOfFrom,
-        to: endOfTo
-      }
-    });
+        to: endOfTo,
+      },
+    })
     // router.push(
     //   `test?from=${encodeURIComponent(from.startOf('day').format())}&to=${encodeURIComponent(to.endOf('day').format())}`,
     //   `test?from=${encodeURIComponent(from.startOf('day').format())}&to=${encodeURIComponent(to.endOf('day').format())}`,
     // );
-  };
+  }
 
   return (
     <>
       <Head>
         <title>Dashboard</title>
       </Head>
-      
+
       <Row gutter={[16, 16]}>
         <Col xs={24}>
           <Row gutter={16} align="middle">
@@ -155,7 +151,8 @@ const DashboardPage: NextPage<Props> = ({
               total={data1.total_f}
               evolution={data1.evolution}
               title="Total Revenue"
-              yLabel="Turnover"/>
+              yLabel="Turnover"
+            />
           </Card>
         </Col>
 
@@ -166,7 +163,8 @@ const DashboardPage: NextPage<Props> = ({
               total={data2.total_f}
               evolution={data2.evolution}
               title="Adspend (global)"
-              yLabel="Adspend"/>
+              yLabel="Adspend"
+            />
           </Card>
         </Col>
 
@@ -177,7 +175,8 @@ const DashboardPage: NextPage<Props> = ({
               total={data3.total_f}
               evolution={data3.evolution}
               title="ROAS"
-              yLabel="ROAS"/>
+              yLabel="ROAS"
+            />
           </Card>
         </Col>
 
@@ -188,7 +187,8 @@ const DashboardPage: NextPage<Props> = ({
               total={data4.total_f}
               evolution={data4.evolution}
               title="CPA"
-              yLabel="CPA"/>
+              yLabel="CPA"
+            />
           </Card>
         </Col>
 
@@ -215,20 +215,19 @@ const DashboardPage: NextPage<Props> = ({
             <Table
               className="table"
               columns={columns}
-              dataSource={data5.data.sort(
-                (a, b) => (a._id.period_start > b._id.period_start) ? -1 : 1)
-              }
+              dataSource={data5.data.sort((a, b) =>
+                a._id.period_start > b._id.period_start ? -1 : 1
+              )}
               pagination={false}
               rowKey="period_f"
-              scroll={{x: true, y: 760 }}
-              size="middle" />
+              scroll={{ x: true, y: 760 }}
+              size="middle"
+            />
           </Card>
         </Col>
 
         <Col xs={24}>
-          <Title level={2}>
-            Store Insights
-          </Title>
+          <Title level={2}>Store Insights</Title>
         </Col>
 
         <Col xs={24} sm={12} md={8} xl={6}>
@@ -250,7 +249,8 @@ const DashboardPage: NextPage<Props> = ({
               total={data7.total_f}
               evolution={data7.evolution}
               title="Average Order Value"
-              yLabel="AOV"/>
+              yLabel="AOV"
+            />
           </Card>
         </Col>
 
@@ -267,30 +267,33 @@ const DashboardPage: NextPage<Props> = ({
         </Col> */}
       </Row>
     </>
-  );
-};
+  )
+}
 
-export default DashboardPage;
+export default DashboardPage
 
-export const getServerSideProps = withAuth(async ({ ctx, user }: { ctx: GetServerSidePropsContext, user: any }) => {  
-  const { from = '', to = '' } = ctx.query;
-  
-  const data = await fetch(
-    `/context/dashboard${buildQueryString({ from, to })}`,
-    null,
-    ctx
-  );
+interface DashboardQueryParams {
+  from?: string
+  to?: string
+}
 
-  if (data?.redirect) {
-    return data;
-  }
+export const getServerSideProps: GetServerSideProps = withAuth(
+  async ({ ctx, user }: { ctx: GetServerSidePropsContext; user: any }) => {
+    const { from = '', to = '' }: DashboardQueryParams = ctx.query
 
-  return {
-    props: {
-      user,
-      initialData: data,
-      initialFrom: data.from,
-      initialTo: data.to
+    const data = await fetch(`/context/dashboard${buildQueryString({ from, to })}`, null, ctx)
+
+    if (data?.redirect) {
+      return data
     }
-  };
-});
+
+    return {
+      props: {
+        user,
+        initialData: data,
+        initialFrom: data.from,
+        initialTo: data.to,
+      },
+    }
+  }
+)

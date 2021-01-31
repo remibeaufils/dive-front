@@ -1,8 +1,8 @@
-import React from 'react';
-import { Table } from 'antd';
+import React from 'react'
+import { Table } from 'antd'
 
 type Props = {
-  columns: [],
+  columns: []
   data: []
 }
 
@@ -13,8 +13,9 @@ const DashboardTable: React.FC<Props> = (props) => {
       columns={props.columns}
       dataSource={props.data}
       pagination={false}
-      scroll={{x: true}}/>
-  );
-};
+      scroll={{ x: true }}
+    />
+  )
+}
 
-export default DashboardTable;
+export default DashboardTable

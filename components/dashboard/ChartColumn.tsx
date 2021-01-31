@@ -1,19 +1,26 @@
-import React from 'react';
-import { Column } from '@ant-design/charts';
-import moment from 'moment';
-import "./Chart.less";
-import ChartEvolution from './ChartEvolution';
+import React from 'react'
+import { Column } from '@ant-design/charts'
+import moment from 'moment'
+import './Chart.less'
+import ChartEvolution from './ChartEvolution'
 
 type Props = {
-  data: any,
-  total: number,
-  evolution: string,
-  height?: number,
-  title?: string,
-  yLabel?: string,
+  data: any
+  total: number
+  evolution: string
+  height?: number
+  title?: string
+  yLabel?: string
 }
 
-const ChartColumn: React.FC<Props> = ({ data, evolution, height = 131, title, total, yLabel }: Props) => {
+const ChartColumn: React.FC<Props> = ({
+  data,
+  evolution,
+  height = 131,
+  title,
+  total,
+  yLabel,
+}: Props) => {
   const config = {
     data,
     // color: '#092292',
@@ -21,21 +28,21 @@ const ChartColumn: React.FC<Props> = ({ data, evolution, height = 131, title, to
     xField: 'x',
     yField: 'y',
     meta: {
-      y: { alias: yLabel }
+      y: { alias: yLabel },
     },
     xAxis: {
       // line: null,
       type: 'timeCat',
       label: {
         // formatter: (month: string) => month.substr(0,3)
-        formatter: (x: string) => moment(x).format('MMM, DD')
+        formatter: (x: string) => moment(x).format('MMM, DD'),
       },
     },
     yAxis: {
       grid: null,
-      label: null
-    }
-  };
+      label: null,
+    },
+  }
 
   return (
     <>
@@ -44,11 +51,11 @@ const ChartColumn: React.FC<Props> = ({ data, evolution, height = 131, title, to
       <p className="total">
         {total}
         &nbsp;
-        <ChartEvolution evolution={evolution}/>
+        <ChartEvolution evolution={evolution} />
       </p>
-      <Column height={height} {...config}/>
+      <Column height={height} {...config} />
     </>
-  );
-};
+  )
+}
 
-export default ChartColumn;
+export default ChartColumn
