@@ -1,16 +1,16 @@
 import React from 'react'
 import Head from 'next/head'
 import { Card, Col, Row, DatePicker, Table, Typography } from 'antd'
-import ChartArea from '../components/dashboard/ChartArea'
-import ChartColumn from '../components/dashboard/ChartColumn'
 import './index.less'
 import { GetServerSideProps, GetServerSidePropsContext, NextPage } from 'next'
 import fetch from '../lib/fetch'
 import { withAuth } from '../lib/withAuth'
 import { buildQueryString } from '../lib/buildQueryString'
 import { useRouter } from 'next/router'
-import ChartLine from '../components/dashboard/ChartLine'
 import moment from 'moment'
+import { ColumnType } from 'antd/lib/table'
+import { format } from '../lib/formatters'
+import ChartCard from '../components/dashboard/ChartCard'
 
 // WORKS with AntdDayjsWebpackPlugin that replaces moment.
 // import 'dayjs/locale/zh-cn';
@@ -19,6 +19,27 @@ import moment from 'moment'
 
 const { RangePicker } = DatePicker
 const { Title } = Typography
+
+type Row = {
+  _id: { period_type: string; period_start: string }
+  period: string
+  turnover: number
+  ad_spend: number
+  purchases_total: number
+  purchases_value_total: number
+  roas: number
+  cpa: number
+  orders_count: number
+  orders_avg_value: number
+  topCountry: string
+  conversion_rate: number
+  abandonment_rate: number
+  vat: number
+  quantity: number
+  profit: number
+  profit_per_unit: number
+}
+
 type Props = {
   initialData: any
   initialFrom: string
@@ -61,8 +82,7 @@ const DashboardPage: NextPage<Props> = ({ initialData, initialFrom, initialTo })
   // }, [router.query]);
 
   // const data = initialData;
-  const { data1, data2, data3, data4, data5, data6, data7 } = initialData.data
-  const columns = initialData.columns
+  const { data1, data2, data3, data4, data5, data6, data7 } = initialData.data || {}
   const [from, to] = [moment(initialFrom), moment(initialTo)]
 
   const router = useRouter()
@@ -144,77 +164,45 @@ const DashboardPage: NextPage<Props> = ({ initialData, initialFrom, initialTo })
           </Row>
         </Col>
 
-        <Col xs={24} sm={12} md={8} xl={6}>
-          <Card className="card">
-            <ChartArea
-              data={data1.data}
-              total={data1.total_f}
-              evolution={data1.evolution}
-              title="Total Revenue"
-              yLabel="Turnover"
-            />
-          </Card>
-        </Col>
+        {!initialData.data ? (
+          'There is no data for the range picked.'
+        ) : (
+          <>
+            <ChartCard serie={data1} />
 
-        <Col xs={24} sm={12} md={8} xl={6}>
-          <Card className="card">
-            <ChartColumn
-              data={data2.data}
-              total={data2.total_f}
-              evolution={data2.evolution}
-              title="Adspend (global)"
-              yLabel="Adspend"
-            />
-          </Card>
-        </Col>
+            <ChartCard serie={data2} />
 
-        <Col xs={24} sm={12} md={8} xl={6}>
-          <Card className="card">
-            <ChartLine
-              data={data3.data}
-              total={data3.total_f}
-              evolution={data3.evolution}
-              title="ROAS"
-              yLabel="ROAS"
-            />
-          </Card>
-        </Col>
+            <ChartCard serie={data3} />
 
-        <Col xs={24} sm={12} md={8} xl={6}>
-          <Card className="card">
-            <ChartLine
-              data={data4.data}
-              total={data4.total_f}
-              evolution={data4.evolution}
-              title="CPA"
-              yLabel="CPA"
-            />
-          </Card>
-        </Col>
+            <ChartCard serie={data4} />
 
-        <Col xs={24}>
-          <Card className="card">
-            {/* <Table<DataRow>
+            <Col xs={24}>
+              <Card className="card">
+                <Table<Row>
+                  className="table"
+                  dataSource={data5.data}
+                  pagination={false}
+                  scroll={{ x: true, y: 750 }}
+                >
+                  {data5.columns.map(
+                    ({ align, dataIndex, title, width }: ColumnType<Row>, index: number) => (
+                      <Table.Column<Row>
+                        align={align}
+                        dataIndex={dataIndex}
+                        key={index}
+                        title={title}
+                        width={width}
+                        render={(value: any) =>
+                          value ? format(data5.types[dataIndex as string], value) : null
+                        }
+                      />
+                    )
+                  )}
+                </Table>
+
+                {/* <Table<Row>
               className="table"
-              dataSource={data.lines}
-              pagination={false}
-              rowKey={record => record._id.period_start}
-              scroll={{x: true, y: 750 }}>
-              {data.columns.map(({ align, dataIndex, key, title, width }: ColumnType<DataRow>, index) => (
-                <Table.Column<DataRow>
-                  align={align}
-                  dataIndex={dataIndex}
-                  key={index}
-                  title={title}
-                  width={width}
-                />
-              ))}
-              </Table> */}
-
-            {/* <Table<DataRow> */}
-            <Table
-              className="table"
-              columns={columns}
+              columns={data5.columns}
               dataSource={data5.data.sort((a, b) =>
                 a._id.period_start > b._id.period_start ? -1 : 1
               )}
@@ -222,49 +210,23 @@ const DashboardPage: NextPage<Props> = ({ initialData, initialFrom, initialTo })
               rowKey="period_f"
               scroll={{ x: true, y: 760 }}
               size="middle"
-            />
-          </Card>
-        </Col>
+            /> */}
+              </Card>
+            </Col>
 
-        <Col xs={24}>
-          <Title level={2}>Store Insights</Title>
-        </Col>
+            <Col xs={24}>
+              <Title level={2}>Store Insights</Title>
+            </Col>
 
-        <Col xs={24} sm={12} md={8} xl={6}>
-          <Card className="card">
-            <ChartColumn
-              data={data6.data}
-              total={data6.total_f}
-              evolution={data6.evolution}
-              title="Total Orders"
-              yLabel="Total"
-            />
-          </Card>
-        </Col>
+            <ChartCard serie={data6} />
 
-        <Col xs={24} sm={12} md={8} xl={6}>
-          <Card className="card">
-            <ChartArea
-              data={data7.data}
-              total={data7.total_f}
-              evolution={data7.evolution}
-              title="Average Order Value"
-              yLabel="AOV"
-            />
-          </Card>
-        </Col>
+            <ChartCard serie={data7} />
 
-        {/* <Col xs={24} sm={12} md={8} xl={6}>
-          <Card className="card">
-            <ChartLine title="Conversion Rate" data={data8}></ChartLine>
-          </Card>
-        </Col>
+            {/* <ChartCard serie={data8} />
 
-        <Col xs={24} sm={12} md={8} xl={6}>
-          <Card className="card">
-            <ChartArea title="Abandonment Rate" data={data9}></ChartArea>
-          </Card>
-        </Col> */}
+        <ChartCard serie={data9} /> */}
+          </>
+        )}
       </Row>
     </>
   )

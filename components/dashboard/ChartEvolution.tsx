@@ -1,20 +1,21 @@
 import React from 'react'
 import { Typography } from 'antd'
 import './ChartEvolution.less'
+import { format } from '../../lib/formatters'
 
 const { Text } = Typography
 
 type Props = {
-  evolution: string
+  evolution: number
 }
 
 const ChartEvolution: React.FC<Props> = ({ evolution }: Props) => {
-  if (['0', '0%'].includes(evolution)) return null
+  if (!evolution) return null
 
   return (
-    <Text className="evolution" type={evolution.startsWith('-') ? 'warning' : 'success'}>
-      {!evolution.startsWith('-') ? '+' : ''}
-      {evolution}
+    <Text className="evolution" type={evolution < 0 ? 'warning' : 'success'}>
+      {evolution < 0 ? '-' : '+'}
+      {format('percent', evolution)}
     </Text>
   )
 }

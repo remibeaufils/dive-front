@@ -1,16 +1,17 @@
 import React from 'react'
 import { Column } from '@ant-design/charts'
-import moment from 'moment'
-import './Chart.less'
-import ChartEvolution from './ChartEvolution'
+import { format } from '../../lib/formatters'
+import ChartLegend from './ChartLegend'
 
 type Props = {
   data: any
   total: number
-  evolution: string
+  evolution: number
   height?: number
   title?: string
+  xType?: string
   yLabel?: string
+  yType?: string
 }
 
 const ChartColumn: React.FC<Props> = ({
@@ -19,7 +20,9 @@ const ChartColumn: React.FC<Props> = ({
   height = 131,
   title,
   total,
+  xType,
   yLabel,
+  yType,
 }: Props) => {
   const config = {
     data,
@@ -28,14 +31,16 @@ const ChartColumn: React.FC<Props> = ({
     xField: 'x',
     yField: 'y',
     meta: {
-      y: { alias: yLabel },
+      x: { formatter: (val: string) => format(xType, val, true) },
+      y: { alias: yLabel, formatter: (val: string) => format(yType, val) },
     },
     xAxis: {
-      // line: null,
-      type: 'timeCat',
+      nice: true,
+      line: null,
+      // type: 'timeCat',
       label: {
-        // formatter: (month: string) => month.substr(0,3)
-        formatter: (x: string) => moment(x).format('MMM, DD'),
+        // autoHide: true, // default = true
+        formatter: (x: string) => format(xType, x, true),
       },
     },
     yAxis: {
@@ -46,13 +51,7 @@ const ChartColumn: React.FC<Props> = ({
 
   return (
     <>
-      {/* <Title level={5} className="title">{title}</Title> */}
-      <p className="title">{title}</p>
-      <p className="total">
-        {total}
-        &nbsp;
-        <ChartEvolution evolution={evolution} />
-      </p>
+      <ChartLegend evolution={evolution} title={title} total={total} yType={yType} />
       <Column height={height} {...config} />
     </>
   )

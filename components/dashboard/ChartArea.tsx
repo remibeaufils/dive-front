@@ -1,20 +1,30 @@
 import React from 'react'
 import { Area } from '@ant-design/charts'
 import { AreaConfig } from '@ant-design/charts/es/area'
-import moment from 'moment'
-import './Chart.less'
-import ChartEvolution from './ChartEvolution'
+import { format } from '../../lib/formatters'
+import ChartLegend from './ChartLegend'
 
 type Props = {
   data: any
   total: number
-  evolution: string
+  evolution: number
   height?: number
   title?: string
+  xType?: string
   yLabel?: string
+  yType?: string
 }
 
-const ChartArea: React.FC<Props> = ({ data, evolution, height, title, total, yLabel }: Props) => {
+const ChartArea: React.FC<Props> = ({
+  data,
+  evolution,
+  height,
+  title,
+  total,
+  xType,
+  yLabel,
+  yType,
+}: Props) => {
   // https://g2.antv.vision/en/docs/manual/tutorial/scale
   const config: AreaConfig = {
     data,
@@ -24,18 +34,19 @@ const ChartArea: React.FC<Props> = ({ data, evolution, height, title, total, yLa
     xField: 'x',
     yField: 'y',
     meta: {
-      y: { alias: yLabel },
+      x: { formatter: (val: string) => format(xType, val, true) },
+      y: { alias: yLabel, formatter: (val: string) => format(yType, val) },
     },
     xAxis: {
-      // tickInterval: 3,
-      // mask: 'YYYY-MM-DDTHH:MM:SSZ',
-      type: 'timeCat',
-      // type: 'cat',
       nice: true,
       line: null,
+      // tickInterval: 3,
+      // mask: 'YYYY-MM-DDTHH:MM:SSZ',
+      // type: 'timeCat',
+      // type: 'cat',
       label: {
         // autoHide: true, // default = true
-        formatter: (x: string) => moment(x).format('MMM, DD'),
+        formatter: (x: string) => format(xType, x, true),
       },
     },
     yAxis: {
@@ -53,13 +64,7 @@ const ChartArea: React.FC<Props> = ({ data, evolution, height, title, total, yLa
 
   return (
     <>
-      {/* <Title level={5} className="title">{title}</Title> */}
-      <p className="title">{title}</p>
-      <p className="total">
-        {total}
-        &nbsp;
-        <ChartEvolution evolution={evolution} />
-      </p>
+      <ChartLegend evolution={evolution} title={title} total={total} yType={yType} />
       <Area {...config} />
     </>
   )
